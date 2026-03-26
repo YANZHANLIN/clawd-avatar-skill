@@ -612,15 +612,20 @@ done
 if ((minR>maxR)); then echo "(empty)"; exit 0; fi
 
 if [[ "$OUTPUT" == "png" ]]; then
-  # ═══ PNG OUTPUT (via PPM → ffmpeg) ═══
-  cols=$(( maxC - minC + 1 ))
-  rows=$(( maxR - minR + 1 ))
+  # ═══ PNG OUTPUT (fixed 1:1 square canvas via PPM → ffmpeg) ═══
+  SZ=$((W > H ? W : H))
+  padTop=$(( (SZ - H) / 2 ))
   PPM_TMP="${PNG_FILE%.png}.ppm"
   {
-    printf "P6\n%d %d\n255\n" "$cols" "$rows"
-    for ((r=minR; r<=maxR; r++)); do
-      for ((c=minC; c<=maxC; c++)); do
-        color="${GRID[$((r*W+c))]}"
+    printf "P6\n%d %d\n255\n" "$SZ" "$SZ"
+    for ((r=0; r<SZ; r++)); do
+      for ((c=0; c<SZ; c++)); do
+        gr=$((r - padTop))
+        if ((gr >= 0 && gr < H && c < W)); then
+          color="${GRID[$((gr*W+c))]}"
+        else
+          color=""
+        fi
         if [[ -n "$color" ]]; then
           IFS=';' read -ra RGB <<< "$color"
           printf "\\x$(printf '%02x' "${RGB[0]}")\\x$(printf '%02x' "${RGB[1]}")\\x$(printf '%02x' "${RGB[2]}")"
