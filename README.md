@@ -6,6 +6,18 @@ Also includes an HTML animation mode for browser-based animated scenes.
 
 ![Terminal Mode](https://img.shields.io/badge/mode-terminal_ANSI-brightgreen) ![Animation Mode](https://img.shields.io/badge/mode-HTML_animation-blue)
 
+## Gallery
+
+| Classic | Luffy | Harry Potter | Naruto | Zoro |
+|:---:|:---:|:---:|:---:|:---:|
+| ![Classic](assets/01-classic.png) | ![Luffy](assets/02-luffy.png) | ![Harry Potter](assets/03-harry-potter.png) | ![Naruto](assets/04-naruto.png) | ![Zoro](assets/05-zoro.png) |
+| Default | Straw hat + vest | Wizard + potter | Ninja + rasengan | Pirate + katana |
+
+| Akatsuki | Hula Dancer | Christmas | King | Coder |
+|:---:|:---:|:---:|:---:|:---:|
+| ![Akatsuki](assets/06-akatsuki.png) | ![Hula](assets/07-hula-dancer.png) | ![Christmas](assets/08-christmas.png) | ![King](assets/09-king.png) | ![Coder](assets/10-coder.png) |
+| Kasa + cloak | Flower + hula | Santa hat | Crown + heart | Laptop |
+
 ## Quick Start
 
 ```bash
