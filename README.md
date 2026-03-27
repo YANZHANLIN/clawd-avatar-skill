@@ -46,9 +46,9 @@ bash scripts/render.sh --hat crown --png output.png     # 导出图片
 - 粒子效果、对话气泡、情绪表达
 - 单 HTML 文件，零依赖
 
-| 吃冰淇淋 | 收到爱心 |
+| 樱花树下 | 抓气球 |
 |:---:|:---:|
-| ![Ice Cream](assets/11-animation-ice-cream.png) | ![Kiss](assets/12-animation-kiss.png) |
+| ![Cherry Blossom](assets/11-animation-cherry-blossom.png) | ![Balloon](assets/12-animation-balloon.png) |
 
 ---
 
@@ -173,8 +173,8 @@ clawd-avatar-skill/
 └── references/
     ├── template.html         # 动画模式模板
     ├── scene-template.html   # 场景模式模板
-    ├── ice-cream.html        # 动画参考：多阶段编排
-    ├── clawd-kiss.html       # 动画参考：情绪/粒子
+    ├── cherry-blossom.html   # 动画参考：樱花树下（多阶段+粒子）
+    ├── balloon.html          # 动画参考：抓气球（角色与道具互动）
     ├── body-data.md          # 身体像素数据
     ├── decorations.md        # 帽子/道具像素数据
     └── presets.md            # 预设参数速查

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Clawd Balloon</title>
+<style>
+*{margin:0;padding:0}
+body{background:#000;overflow:hidden}
+canvas{image-rendering:pixelated;image-rendering:crisp-edges;display:block;width:100vw;height:100vh}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+const cv=document.getElementById('c');const ctx=cv.getContext('2d');
+cv.width=720;cv.height=720;
+
+const PX=20;
+function px(x,y,c){ctx.fillStyle=c;ctx.fillRect(x*PX,y*PX,PX,PX);}
+
+const BODY=[
+  [0,0,0,1,1,1,1,1,1,1,1,0,0,0],
+  [0,0,0,1,1,1,1,1,1,1,1,0,0,0],
+  [0,1,1,1,1,1,1,1,1,1,1,1,1,0],
+  [0,1,1,1,1,1,1,1,1,1,1,1,1,0],
+  [0,0,0,1,1,1,1,1,1,1,1,0,0,0],
+  [0,0,0,1,1,1,1,1,1,1,1,0,0,0],
+  [0,0,0,1,0,1,0,0,1,0,1,0,0,0],
+  [0,0,0,1,0,1,0,0,1,0,1,0,0,0]
+];
+
+function drawClawd(ox,oy,eyes,armR){
+  const ar=armR||0;
+  ctx.globalAlpha=0.1;ctx.fillStyle='#000';
+  ctx.beginPath();ctx.ellipse((ox+7)*PX,(oy+9)*PX,7*PX,2*PX,0,0,6.28);ctx.fill();
+  ctx.globalAlpha=1;
+  for(let r=0;r<8;r++) for(let c=0;c<14;c++){
+    if(!BODY[r][c])continue;
+    if((r===2||r===3)&&c>=12)continue; // skip right arm area
+    px(ox+c,oy+r,'#CD6E58');
+  }
+  // Right arm with offset
+  px(ox+12,oy+2+ar,'#CD6E58');px(ox+13,oy+2+ar,'#CD6E58');
+  px(ox+12,oy+3+ar,'#CD6E58');px(ox+13,oy+3+ar,'#CD6E58');
+  // Eyes
+  if(eyes!=='blink'){
+    const ec=eyes==='sparkle'?'#FFD700':'#000';
+    const dy=eyes==='up'?-1:0;
+    px(ox+4,oy+1+dy,ec);px(ox+9,oy+1+dy,ec);
+  }
+}
+
+function drawBalloon(bx,by,col,highlight){
+  // Balloon body (5x6 oval)
+  for(let dy=-3;dy<=2;dy++) for(let dx=-2;dx<=2;dx++){
+    const d=dx*dx/(4)+dy*dy/(9);
+    if(d<=1) px(bx+dx,by+dy,col);
+  }
+  // Highlight
+  px(bx-1,by-2,highlight);px(bx-1,by-1,highlight);
+  // Knot
+  px(bx,by+3,col);
+  // String
+  px(bx,by+4,'#888');px(bx,by+5,'#888');px(bx,by+6,'#888');
+}
+
+// Floating dots
+const dots=[];
+for(let i=0;i<50;i++){
+  dots.push({x:Math.random()*720,y:Math.random()*720,r:1.5+Math.random()*2,vy:-(0.1+Math.random()*0.2),phase:Math.random()*6.28,alpha:0.06+Math.random()*0.1});
+}
+function drawDots(f){
+  dots.forEach(d=>{
+    d.y+=d.vy;d.x+=Math.sin(f*0.02+d.phase)*0.1;
+    if(d.y<-10){d.y=730;d.x=Math.random()*720;}
+    ctx.globalAlpha=d.alpha;ctx.fillStyle='#000';
+    ctx.beginPath();ctx.arc(d.x,d.y,d.r,0,6.28);ctx.fill();
+  });
+  ctx.globalAlpha=1;
+}
+
+// Grass
+function drawGround(){
+  for(let x=0;x<36;x++) for(let y=28;y<36;y++){
+    const h=((Math.sin(x*127.1+y*311.7)*43758.5453)%1+1)%1;
+    px(x,y,h>0.5?'#7BAE56':'#6B9E4A');
+  }
+  [[4,29,'#FFD700'],[10,30,'#FF88AA'],[22,29,'#F8F0E8'],[30,31,'#AA77DD'],[16,30,'#FFD700']].forEach(([x,y,c])=>px(x,y,c));
+}
+
+let particles=[];
+const FPS=30,DUR=7,TOTAL=FPS*DUR;
+let frame=0;
+
+function render(){
+  const f=frame%TOTAL;
+  const t=f/TOTAL;
+
+  ctx.fillStyle='#F9F7F4';ctx.fillRect(0,0,720,720);
+  drawDots(frame);
+  drawGround();
+
+  const cx=11,cy=20;
+
+  // Phase 1 (0-0.2): Clawd standing, balloon floats down from top
+  // Phase 2 (0.2-0.35): Balloon arrives, clawd looks up
+  // Phase 3 (0.35-0.5): Clawd reaches up to grab it
+  // Phase 4 (0.5-0.65): Got it! Sparkle eyes, arm holds string
+  // Phase 5 (0.65-0.85): Happy bounce with balloon
+  // Phase 6 (0.85-1.0): Settle, balloon gently sways
+
+  let eyes='forward', armR=0;
+  let balloonX=18, balloonY;
+  let showBalloon=true;
+  let stringAttached=false;
+
+  if(t<0.2){
+    // Balloon floating down from sky
+    const bt=t/0.2;
+    balloonY=Math.round(-6+bt*12);
+    eyes='forward';
+  } else if(t<0.35){
+    // Balloon near, clawd notices
+    const bt=(t-0.2)/0.15;
+    balloonY=6+Math.round(Math.sin(bt*3)*0.5);
+    balloonX=18-Math.round(bt*2);
+    eyes='up';
+  } else if(t<0.5){
+    // Reaching up
+    const bt=(t-0.35)/0.15;
+    armR=Math.round(-3*bt);
+    balloonX=16;
+    balloonY=6+Math.round(Math.sin(frame*0.1)*0.5);
+    eyes='up';
+    // Balloon drifts closer
+    balloonX=16-Math.round(bt*2);
+  } else if(t<0.55){
+    // Grab moment!
+    armR=-3;
+    balloonX=cx+13;
+    balloonY=cy-5;
+    stringAttached=true;
+    eyes='sparkle';
+    // Particles on grab
+    if(f===Math.floor(0.5*TOTAL)){
+      for(let i=0;i<10;i++){
+        const a=Math.random()*6.28,sp=0.3+Math.random()*0.4;
+        particles.push({x:cx+13,y:cy-2,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-0.4,life:1,col:['#E84040','#FFD700','#FF88AA'][i%3]});
+      }
+    }
+  } else if(t<0.75){
+    // Happy bounce
+    const bt=(t-0.55)/0.2;
+    const bounce=Math.sin(bt*Math.PI*2)*1.5;
+    armR=-3;
+    stringAttached=true;
+    balloonX=cx+13;
+    balloonY=cy-5+Math.round(Math.sin(frame*0.08)*0.8);
+    eyes='sparkle';
+    // Slight body bounce via drawing offset handled by balloon sway
+  } else {
+    // Calm sway
+    armR=-2;
+    stringAttached=true;
+    balloonX=cx+13+Math.round(Math.sin(frame*0.04)*0.5);
+    balloonY=cy-5+Math.round(Math.sin(frame*0.06)*0.5);
+    eyes='forward';
+  }
+
+  // Draw clawd
+  drawClawd(cx,cy,eyes,armR);
+
+  // Draw balloon
+  if(showBalloon){
+    drawBalloon(balloonX,balloonY,'#E84040','#FF6B6B');
+    if(stringAttached){
+      // String from balloon to hand
+      ctx.strokeStyle='#888';ctx.lineWidth=2;
+      ctx.beginPath();
+      ctx.moveTo(balloonX*PX+PX/2,(balloonY+4)*PX);
+      ctx.lineTo((cx+13)*PX,(cy+2+armR)*PX+PX/2);
+      ctx.stroke();
+    }
+  }
+
+  // Tiny second balloon in distance (decoration)
+  const farBY=4+Math.sin(frame*0.03)*1.5;
+  px(32,Math.round(farBY),'#4488DD');px(32,Math.round(farBY)+1,'#4488DD');
+  px(31,Math.round(farBY),'#6AB0E8');
+  px(32,Math.round(farBY)+2,'#888');
+
+  // Particles
+  for(let i=particles.length-1;i>=0;i--){
+    const p=particles[i];
+    p.x+=p.vx;p.y+=p.vy;p.vy+=0.03;p.life-=0.02;
+    if(p.life<=0){particles.splice(i,1);continue;}
+    ctx.globalAlpha=Math.min(1,p.life*2);
+    px(Math.round(p.x),Math.round(p.y),p.col);
+  }
+  ctx.globalAlpha=1;
+
+  frame++;
+  requestAnimationFrame(render);
+}
+
+requestAnimationFrame(render);
+</script>
+</body>
+</html>

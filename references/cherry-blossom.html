@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Clawd Cherry Blossom</title>
+<style>
+*{margin:0;padding:0}
+body{background:#000;overflow:hidden}
+canvas{image-rendering:pixelated;image-rendering:crisp-edges;display:block;width:100vw;height:100vh}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+const cv=document.getElementById('c');const ctx=cv.getContext('2d');
+function resize(){cv.width=720;cv.height=720;}
+resize();
+
+const PX=20,GW=36,GH=36;
+function px(x,y,c){ctx.fillStyle=c;ctx.fillRect(x*PX,y*PX,PX,PX);}
+
+// Clawd body 14x8
+const BODY=[
+  [0,0,0,1,1,1,1,1,1,1,1,0,0,0],
+  [0,0,0,1,1,1,1,1,1,1,1,0,0,0],
+  [0,1,1,1,1,1,1,1,1,1,1,1,1,0],
+  [0,1,1,1,1,1,1,1,1,1,1,1,1,0],
+  [0,0,0,1,1,1,1,1,1,1,1,0,0,0],
+  [0,0,0,1,1,1,1,1,1,1,1,0,0,0],
+  [0,0,0,1,0,1,0,0,1,0,1,0,0,0],
+  [0,0,0,1,0,1,0,0,1,0,1,0,0,0]
+];
+
+function drawClawd(ox,oy,eyes,jumpY){
+  const jy=jumpY||0;
+  // Shadow
+  ctx.globalAlpha=0.1;
+  ctx.fillStyle='#000';
+  ctx.beginPath();ctx.ellipse((ox+7)*PX,(oy+9)*PX,7*PX,2*PX,0,0,Math.PI*2);ctx.fill();
+  ctx.globalAlpha=1;
+  // Body
+  for(let r=0;r<8;r++) for(let c=0;c<14;c++){
+    if(BODY[r][c]) px(ox+c,oy+r+jy,'#CD6E58');
+  }
+  // Eyes
+  if(eyes!=='blink'){
+    const ec=eyes==='sparkle'?'#FFD700':'#000';
+    const dy=eyes==='up'?-1:eyes==='down'?1:0;
+    px(ox+4,oy+1+dy+jy,ec);px(ox+9,oy+1+dy+jy,ec);
+  }
+  // Flower crown
+  for(let d=3;d<=11;d++) px(ox+d,oy-1+jy,'#44AA44');
+  px(ox+4,oy-2+jy,'#FF88AA');px(ox+5,oy-2+jy,'#FF88AA');
+  px(ox+7,oy-2+jy,'#FFD700');px(ox+8,oy-2+jy,'#FFD700');
+  px(ox+10,oy-2+jy,'#FF88AA');px(ox+11,oy-2+jy,'#FF88AA');
+  px(ox+4,oy-3+jy,'#F8F0E8');px(ox+7,oy-3+jy,'#F8F0E8');px(ox+10,oy-3+jy,'#F8F0E8');
+}
+
+// Cherry tree
+function drawTree(){
+  // Trunk
+  for(let y=10;y<24;y++){px(27,y,'#5C3A1E');px(28,y,'#5C3A1E');}
+  px(26,14,'#5C3A1E');px(26,15,'#5C3A1E');
+  // Branch left
+  px(25,12,'#5C3A1E');px(24,11,'#5C3A1E');px(23,10,'#5C3A1E');
+  // Branch right
+  px(29,11,'#5C3A1E');px(30,10,'#5C3A1E');px(31,9,'#5C3A1E');
+  // Crown
+  const crownPixels=[];
+  for(let dy=-8;dy<=2;dy++) for(let dx=-8;dx<=8;dx++){
+    const d=Math.sqrt(dx*dx+dy*dy);
+    if(d<7+Math.sin(dx*0.5)*1.5){
+      const x=28+dx,y=8+dy;
+      if(x>=0&&x<GW&&y>=0){
+        const h=((Math.sin(x*127.1+y*311.7)*43758.5453)%1+1)%1;
+        const c=h>0.6?'#FFB0C4':h>0.3?'#E8849E':'#FFCDD8';
+        crownPixels.push([x,y,c]);
+      }
+    }
+  }
+  crownPixels.forEach(([x,y,c])=>px(x,y,c));
+}
+
+// Ground
+function drawGround(){
+  for(let x=0;x<GW;x++){
+    for(let y=26;y<GH;y++){
+      const h=((Math.sin(x*127.1+y*311.7)*43758.5453)%1+1)%1;
+      px(x,y,h>0.6?'#7BAE56':h>0.3?'#6B9E4A':'#5B8C3E');
+    }
+  }
+  // Small flowers on ground
+  [[5,28,'#F8F0E8'],[12,30,'#FFD700'],[20,29,'#FF88AA'],[8,32,'#AA77DD'],[15,27,'#F8F0E8'],[30,31,'#FFD700'],[3,34,'#FF88AA'],[25,33,'#F8F0E8']].forEach(([x,y,c])=>px(x,y,c));
+}
+
+// Petals
+const petals=[];
+for(let i=0;i<40;i++){
+  petals.push({
+    x:10+Math.random()*22, y:Math.random()*20,
+    vy:0.02+Math.random()*0.04,
+    vx:(Math.random()-0.5)*0.03,
+    wobble:Math.random()*Math.PI*2,
+    alpha:0.4+Math.random()*0.5,
+    size:1
+  });
+}
+
+function drawPetals(f){
+  petals.forEach(p=>{
+    p.y+=p.vy;
+    p.x+=Math.sin(p.wobble)*0.06+p.vx;
+    p.wobble+=0.015;
+    if(p.y>28){p.y=-1;p.x=10+Math.random()*22;}
+    ctx.globalAlpha=p.alpha;
+    px(Math.round(p.x),Math.round(p.y),'#FFB0C4');
+  });
+  ctx.globalAlpha=1;
+}
+
+// Floating dots
+const dots=[];
+for(let i=0;i<50;i++){
+  dots.push({x:Math.random()*720,y:Math.random()*720,r:1.5+Math.random()*2,vy:-(0.1+Math.random()*0.2),phase:Math.random()*6.28,alpha:0.06+Math.random()*0.1});
+}
+function drawDots(f){
+  dots.forEach(d=>{
+    d.y+=d.vy;d.x+=Math.sin(f*0.02+d.phase)*0.1;
+    if(d.y<-10){d.y=730;d.x=Math.random()*720;}
+    ctx.globalAlpha=d.alpha*(0.7+0.3*Math.sin(f*0.04+d.phase));
+    ctx.fillStyle='#000';ctx.beginPath();ctx.arc(d.x,d.y,d.r,0,6.28);ctx.fill();
+  });
+  ctx.globalAlpha=1;
+}
+
+// Animation
+const FPS=30,DUR=6,TOTAL=FPS*DUR;
+let frame=0;
+
+function render(){
+  const f=frame%TOTAL;
+  const t=f/TOTAL;
+
+  // Background
+  ctx.fillStyle='#F9F7F4';ctx.fillRect(0,0,720,720);
+  drawDots(frame);
+  drawGround();
+  drawTree();
+  drawPetals(frame);
+
+  // Clawd animation: stand → look up → petal lands on head → sparkle jump → reset
+  const cx=8,cy=20;
+  let eyes='forward',jumpY=0;
+
+  if(t<0.2){
+    // Standing, looking forward
+    eyes='forward';
+  } else if(t<0.35){
+    // Look up at petals
+    eyes='up';
+  } else if(t<0.45){
+    // Petal lands — blink
+    eyes='blink';
+    // Draw landed petal on head
+    px(cx+7,cy-4,'#FFB0C4');
+  } else if(t<0.55){
+    // Surprised sparkle eyes
+    eyes='sparkle';
+    px(cx+7,cy-4,'#FFB0C4');
+  } else if(t<0.7){
+    // Happy jump!
+    const jt=(t-0.55)/0.15;
+    const jumpCurve=Math.sin(jt*Math.PI);
+    jumpY=Math.round(-jumpCurve*2);
+    eyes='sparkle';
+    // Particle burst at peak
+    if(f===Math.floor(0.62*TOTAL)){
+      for(let i=0;i<8;i++){
+        const angle=Math.random()*6.28;
+        const sp=0.3+Math.random()*0.5;
+        particles.push({x:cx+7,y:cy-2,vx:Math.cos(angle)*sp,vy:Math.sin(angle)*sp-0.5,life:1,col:['#FFB0C4','#FFD700','#FF88AA'][i%3]});
+      }
+    }
+  } else if(t<0.85){
+    // Settle back, happy
+    eyes='sparkle';
+  } else {
+    // Calm down
+    eyes='forward';
+  }
+
+  drawClawd(cx,cy,eyes,jumpY);
+
+  // Particles
+  for(let i=particles.length-1;i>=0;i--){
+    const p=particles[i];
+    p.x+=p.vx;p.y+=p.vy;p.vy+=0.03;p.life-=0.025;
+    if(p.life<=0){particles.splice(i,1);continue;}
+    ctx.globalAlpha=p.life;
+    px(Math.round(p.x),Math.round(p.y),p.col);
+  }
+  ctx.globalAlpha=1;
+
+  frame++;
+  requestAnimationFrame(render);
+}
+
+let particles=[];
+requestAnimationFrame(render);
+</script>
+</body>
+</html>

@@ -125,8 +125,8 @@ bash ~/.claude/skills/clawd/scripts/render.sh \
 | 文件 | 何时读取 |
 |------|---------|
 | `references/template.html` | 每次生成动画都读 |
-| `references/ice-cream.html` | 需要参考多阶段编排时 |
-| `references/clawd-kiss.html` | 需要参考情绪/粒子表达时 |
+| `references/cherry-blossom.html` | 需要参考多阶段编排 + 粒子效果时 |
+| `references/balloon.html` | 需要参考角色与道具互动时 |
 
 ---
 
