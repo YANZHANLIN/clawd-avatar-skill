@@ -1,263 +1,273 @@
-# Clawd Avatar Skill
+# Clawd 小螃蟹形象生成器
 
-A pixel-art avatar generator for **Clawd** (the Claude mascot crab) that runs directly in your terminal. Supports 15 hats, 27 props, 3 face accessories, 27+ body colors, and full pose control — all rendered as ANSI half-block characters with true color.
+Claude 吉祥物 **Clawd** 的像素风形象生成器，直接在终端里渲染。支持 15 种帽子、27 种道具、3 种面部配饰、27+ 身体颜色和完整的姿势控制 —— 全部用 ANSI 半块字符 + 真彩色渲染。
 
-Three modes: terminal ANSI rendering, browser-based HTML animations, and **multi-character pixel scene panoramas**.
+三种模式：终端 ANSI 渲染、浏览器 HTML 动画、**多角色像素全景大场景**。
 
-![Terminal Mode](https://img.shields.io/badge/mode-terminal_ANSI-brightgreen) ![Animation Mode](https://img.shields.io/badge/mode-HTML_animation-blue) ![Scene Mode](https://img.shields.io/badge/mode-pixel_scene-orange)
+![终端模式](https://img.shields.io/badge/模式-终端_ANSI-brightgreen) ![动画模式](https://img.shields.io/badge/模式-HTML_动画-blue) ![场景模式](https://img.shields.io/badge/模式-像素全景-orange)
 
-## Gallery
+## 效果展示
 
-| Classic | Luffy | Harry Potter | Naruto | Zoro |
+| 经典 | 路飞 | 哈利波特 | 鸣人 | 索隆 |
 |:---:|:---:|:---:|:---:|:---:|
 | ![Classic](assets/01-classic.png) | ![Luffy](assets/02-luffy.png) | ![Harry Potter](assets/03-harry-potter.png) | ![Naruto](assets/04-naruto.png) | ![Zoro](assets/05-zoro.png) |
-| Default | Straw hat + vest | Wizard + potter | Ninja + rasengan | Pirate + katana |
+| 默认造型 | 草帽+马甲 | 巫师帽+眼镜 | 忍者+螺旋丸 | 海贼+刀 |
 
-| Akatsuki | Hula Dancer | Christmas | King | Coder |
+| 晓组织 | 草裙舞 | 圣诞节 | 国王 | 程序员 |
 |:---:|:---:|:---:|:---:|:---:|
 | ![Akatsuki](assets/06-akatsuki.png) | ![Hula](assets/07-hula-dancer.png) | ![Christmas](assets/08-christmas.png) | ![King](assets/09-king.png) | ![Coder](assets/10-coder.png) |
-| Kasa + cloak | Flower + hula | Santa hat | Crown + heart | Laptop |
+| 斗笠+斗篷 | 花冠+草裙 | 圣诞帽 | 皇冠+爱心 | 笔记本电脑 |
 
-## Quick Start
+## 快速开始
 
 ```bash
-# Default standing Clawd
+# 默认站立
 bash scripts/render.sh
 
-# Luffy from One Piece
+# 海贼王路飞
 bash scripts/render.sh --hat straw --prop vest --eyes forward
 
-# Harry Potter
+# 哈利波特
 bash scripts/render.sh --hat wizard --prop wand --accessory potter --color ruby
 
-# Naruto with Rasengan
+# 鸣人 + 螺旋丸
 bash scripts/render.sh --hat ninja --prop rasengan --color orange --armR -3
 
-# Pink hula dancer with flower crown
+# 粉色草裙舞者
 bash scripts/render.sh --hat flower --prop hula --color hotpink --eyes sparkle --armL -3 --armR 1
 ```
 
-## Parameters
+## 三种模式
 
-| Parameter | Description | Default |
-|-----------|-------------|---------|
-| `--eyes` | Eye direction / expression | `forward` |
-| `--armL` | Left arm position (-4 to +4, negative = raised) | `0` |
-| `--armR` | Right arm position (-4 to +4) | `0` |
-| `--legs` | Four leg tilts, comma-separated | `0,0,0,0` |
-| `--hat` | Headwear | `none` |
-| `--prop` | Held item / scene prop | `none` |
-| `--color` | Body color (preset name or hex) | default orange |
-| `--accessory` | Face accessory (coexists with prop) | `none` |
+### 模式 A：终端模式
 
-## Eyes (`--eyes`)
+直接在终端里输出 ANSI 像素画。适合快速换装、生成静态造型。
 
-| Value | Effect |
-|-------|--------|
-| `forward` | Looking straight ahead |
-| `right` / `left` | Looking sideways |
-| `up` / `down` | Looking up / down |
-| `blink` | Eyes closed |
-| `sparkle` | Golden star eyes |
+```bash
+bash scripts/render.sh --hat crown --eyes sparkle
+```
 
-## Hats (`--hat`)
+### 模式 B：动画模式
 
-| Value | Description | Series |
-|-------|-------------|--------|
-| `none` | No hat | - |
-| `cap` | Baseball cap | Basic |
-| `crown` | Golden crown | Basic |
-| `party` | Party hat | Basic |
-| `chef` | Chef hat | Basic |
-| `purple` | Purple top hat | Basic |
-| `headband` | Red sport headband | Basic |
-| `santa` | Santa hat | Basic |
-| `flower` | Flower crown | Spring |
-| `straw` | Straw hat (Luffy) | One Piece |
-| `pirate` | Tricorn pirate hat | One Piece |
-| `wizard` | Wizard hat with stars | Harry Potter |
-| `sorting` | Sorting Hat (floppy) | Harry Potter |
-| `ninja` | Ninja forehead protector | Naruto |
-| `akatsuki` | Akatsuki kasa with paper strips | Naruto |
+生成自包含 HTML 文件，浏览器打开即可看动画。720×720 像素，30 FPS 无缝循环。适合单角色场景（吃东西、下雨、跳舞）。
 
-## Props (`--prop`)
+### 模式 C：场景模式（v2 新增）
 
-### Basic
-| Value | Description |
-|-------|-------------|
-| `heart` | Red heart |
-| `ball` | Soccer ball |
-| `laptop` | Laptop computer |
-| `cake` | Birthday cake with candle |
-| `scarf` | Red scarf |
+多角色像素风全景大场景 —— 类似 Pokemon 像素地图或清明上河图。
 
-### Sport
-| Value | Description |
-|-------|-------------|
-| `surfboard` | Surfboard with waves |
-| `dumbbells` | Dumbbells (follow arms) |
-| `boxing` | Boxing gloves (follow arms) |
+跟 Claude 说：
+- 「画个春游大场景，很多螃蟹在公园里」
+- 「像素公园全景图」
+- 「清明上河图风格，很多螃蟹在做不同的事」
 
-### Spring / Tropical
-| Value | Description |
-|-------|-------------|
-| `hula` | Grass skirt (3-layer fringe) |
-| `bouquet` | Flower bouquet |
-| `lei` | Flower lei necklace |
-| `butterfly` | Pink butterfly |
-| `vest` | Red vest (open front) |
+你会得到：
+- **1440×1920 画布**（3:4 竖版），固定镜头，一眼看全
+- **20-60 只螃蟹**做不同的事：野餐、钓鱼、放风筝、打篮球、做瑜伽、遛狗、画画、跳舞...
+- **丰富地形**：湖泊、河流、桥梁、小路、花园、建筑（咖啡馆、凉亭、游乐场、集市摊位）
+- **动态细节**：流水波纹、樱花花瓣、落叶、喷泉水花、蝴蝶、飘浮音符
+- **边缘延伸**：建筑、树木、角色被画面边缘截断，暗示世界在画面外继续
+- **16 种帽子**、裙子/服装颜色、完整的 16×9 Clawd 身体矩阵
 
-### Harry Potter
-| Value | Description |
-|-------|-------------|
-| `wand` | Magic wand with star |
-| `snitch` | Golden Snitch with wings |
-| `broom` | Flying broomstick |
-| `hpscarf` | Gryffindor house scarf |
+场景模板在 `references/scene-template.html`，Claude 会读取它作为结构参考，根据你的主题生成对应的地形、建筑和角色活动。
 
-### Naruto
-| Value | Description |
-|-------|-------------|
-| `kunai` | Kunai knife |
-| `shuriken` | Throwing star |
-| `rasengan` | Rasengan energy ball (follows arm) |
-| `cloak` | Akatsuki cloak with red clouds |
+## 参数说明
 
-### One Piece
-| Value | Description |
-|-------|-------------|
-| `katana` | Katana sword |
-| `meat` | Big drumstick |
-| `flag` | Pirate Jolly Roger flag |
-| `barrel` | Sake barrel |
+| 参数 | 说明 | 默认值 |
+|------|------|--------|
+| `--eyes` | 眼睛方向/表情 | `forward` |
+| `--armL` | 左手位置（-4 到 +4，负数=举高） | `0` |
+| `--armR` | 右手位置（-4 到 +4） | `0` |
+| `--legs` | 四条腿倾斜，逗号分隔 | `0,0,0,0` |
+| `--hat` | 帽子/头饰 | `none` |
+| `--prop` | 手持物品/场景道具 | `none` |
+| `--color` | 身体颜色（预设名或 hex） | 默认橙 |
+| `--accessory` | 面部配饰（可与 prop 共存） | `none` |
 
-## Face Accessories (`--accessory`)
+## 眼睛 (`--eyes`)
 
-Can be used alongside any `--prop`:
+| 值 | 效果 |
+|----|------|
+| `forward` | 正视前方 |
+| `right` / `left` | 左右看 |
+| `up` / `down` | 上下看 |
+| `blink` | 闭眼 |
+| `sparkle` | 金色星星眼 |
 
-| Value | Description |
-|-------|-------------|
-| `glasses` | Round glasses |
-| `scar` | Lightning bolt scar |
-| `potter` | Glasses + scar combo |
+## 帽子 (`--hat`)
 
-## Body Colors (`--color`)
+| 值 | 说明 | 系列 |
+|----|------|------|
+| `none` | 无帽子 | - |
+| `cap` | 棒球帽 | 基础 |
+| `crown` | 皇冠 | 基础 |
+| `party` | 派对帽 | 基础 |
+| `chef` | 厨师帽 | 基础 |
+| `purple` | 紫色礼帽 | 基础 |
+| `headband` | 红色运动头带 | 基础 |
+| `santa` | 圣诞帽 | 基础 |
+| `flower` | 花冠 | 春日 |
+| `straw` | 草帽（路飞） | 海贼王 |
+| `pirate` | 三角海贼帽 | 海贼王 |
+| `wizard` | 巫师帽（带星星） | 哈利波特 |
+| `sorting` | 分院帽 | 哈利波特 |
+| `ninja` | 忍者护额 | 火影忍者 |
+| `akatsuki` | 晓组织斗笠 | 火影忍者 |
 
-**27 preset names:**
+## 道具 (`--prop`)
 
-| Warm | Cool | Purple | Neutral |
-|------|------|--------|---------|
+### 基础
+| 值 | 说明 |
+|----|------|
+| `heart` | 红色爱心 |
+| `ball` | 足球 |
+| `laptop` | 笔记本电脑 |
+| `cake` | 生日蛋糕 |
+| `scarf` | 红色围巾 |
+
+### 运动
+| 值 | 说明 |
+|----|------|
+| `surfboard` | 冲浪板 |
+| `dumbbells` | 哑铃（跟随手臂） |
+| `boxing` | 拳击手套（跟随手臂） |
+
+### 春日 / 热带
+| 值 | 说明 |
+|----|------|
+| `hula` | 草裙（三层流苏） |
+| `bouquet` | 手捧花 |
+| `lei` | 花环项链 |
+| `butterfly` | 粉色蝴蝶 |
+| `vest` | 红色马甲 |
+
+### 哈利波特
+| 值 | 说明 |
+|----|------|
+| `wand` | 魔杖（带星星） |
+| `snitch` | 金色飞贼 |
+| `broom` | 飞天扫帚 |
+| `hpscarf` | 格兰芬多围巾 |
+
+### 火影忍者
+| 值 | 说明 |
+|----|------|
+| `kunai` | 苦无 |
+| `shuriken` | 手里剑 |
+| `rasengan` | 螺旋丸（跟随手臂） |
+| `cloak` | 晓组织斗篷 |
+
+### 海贼王
+| 值 | 说明 |
+|----|------|
+| `katana` | 武士刀 |
+| `meat` | 大肉腿 |
+| `flag` | 海贼旗 |
+| `barrel` | 酒桶 |
+
+## 面部配饰 (`--accessory`)
+
+可以和任何 `--prop` 同时使用：
+
+| 值 | 说明 |
+|----|------|
+| `glasses` | 圆框眼镜 |
+| `scar` | 闪电疤痕 |
+| `potter` | 眼镜 + 疤痕组合 |
+
+## 身体颜色 (`--color`)
+
+**27 种预设色：**
+
+| 暖色系 | 冷色系 | 紫色系 | 中性 |
+|--------|--------|--------|------|
 | `pink` `hotpink` `rose` | `sky` `blue` `sapphire` | `lavender` `violet` `purple` | `white` |
 | `coral` `peach` `cherry` | `ocean` `turquoise` `teal` | | |
 | `ruby` `red` `sunset` | `mint` `green` `emerald` | | |
 | `tangerine` `orange` `amber` | `lime` | | |
 | `gold` `yellow` `lemon` | | | |
 
-**Custom hex:** `--color FF6B9D` or `--color "#FF6B9D"`
+**自定义 hex：** `--color FF6B9D` 或 `--color "#FF6B9D"`
 
-If omitted, the classic Clawd orange `#CD6E58` is used.
+不指定时使用经典 Clawd 橙 `#CD6E58`。
 
-## Render Z-Order
+## 渲染层级
 
 ```
- 1. Bottom props     (surfboard, broom, cake, laptop, scarf, hpscarf)
- 2. Body
- 3. Legs
- 4. Overlay props    (hula, lei, cloak, vest)
- 5. Arms
- 6. Eyes
- 7. Face accessories (glasses, scar, potter)
- 8. Hat
- 9. Top props        (wand, heart, snitch, katana, meat, flag, etc.)
-10. Arm-follow props (dumbbells, boxing, rasengan)
+ 1. 底层道具     (冲浪板、扫帚、蛋糕、笔记本、围巾)
+ 2. 身体
+ 3. 腿
+ 4. 覆盖层道具   (草裙、花环、斗篷、马甲)
+ 5. 手臂
+ 6. 眼睛
+ 7. 面部配饰     (眼镜、疤痕)
+ 8. 帽子
+ 9. 顶层道具     (魔杖、爱心、飞贼、刀、肉腿、旗帜等)
+10. 跟随手臂道具 (哑铃、拳击手套、螺旋丸)
 ```
 
-## Output Modes
+## 输出格式
 
 ```bash
-# Terminal ANSI (default)
+# 终端 ANSI（默认）
 bash scripts/render.sh --hat crown
 
-# HTML file
+# HTML 文件
 bash scripts/render.sh --hat crown --html output.html
 
-# PNG file (requires ffmpeg)
+# PNG 图片（需要 ffmpeg）
 bash scripts/render.sh --hat crown --png output.png
 ```
 
-## Animation Mode
+## 角色预设速查
 
-For dynamic scenes (eating, dancing, rain), the skill generates a self-contained HTML file using `references/template.html` as a base. These are 720×720 pixel-art animations at 30 FPS with seamless looping.
+| 角色 | 命令 |
+|------|------|
+| **路飞** | `--hat straw --prop vest --eyes forward` |
+| **索隆** | `--hat pirate --prop katana --color emerald --eyes right` |
+| **晓组织** | `--hat akatsuki --prop cloak` |
+| **哈利波特** | `--hat wizard --prop wand --accessory potter` |
+| **魁地奇** | `--hat sorting --prop snitch --accessory glasses --color gold` |
+| **鸣人** | `--hat ninja --prop rasengan --color orange --armR -3` |
 
-## Scene Mode (v2)
-
-For multi-character panoramic scenes — think Pokemon pixel maps or 清明上河图 (Along the River During the Qingming Festival).
-
-Tell Claude something like:
-- "Draw a big scene with lots of crabs at a spring picnic"
-- "Make a pixel park panorama"
-- "清明上河图 style, many crabs doing different activities"
-
-What you get:
-- **1440×1920 canvas** (3:4 portrait), fixed camera, see everything at once
-- **20-60 crabs** doing different things: picnicking, fishing, kite-flying, playing basketball, doing yoga, walking dogs, painting, dancing...
-- **Rich terrain**: lakes, rivers, bridges, paths, flower gardens, buildings (cafes, gazebos, playgrounds, market stalls)
-- **Animated details**: flowing water, cherry blossom petals, falling leaves, fountain spray, butterflies, floating music notes
-- **Edge bleed**: buildings, trees, and crabs cut off at borders — the world extends beyond the frame
-- **16 hat types**, dress/skirt colors, and the full 16×9 Clawd body matrix for detailed characters
-
-The scene template lives at `references/scene-template.html`. Claude reads it as a structural reference and adapts the terrain, buildings, and character activities to match your theme.
-
-## Character Presets
-
-| Character | Command |
-|-----------|---------|
-| **Luffy** | `--hat straw --prop vest --eyes forward` |
-| **Zoro** | `--hat pirate --prop katana --color emerald --eyes right` |
-| **Akatsuki** | `--hat akatsuki --prop cloak` |
-| **Harry Potter** | `--hat wizard --prop wand --accessory potter` |
-| **Quidditch** | `--hat sorting --prop snitch --accessory glasses --color gold` |
-| **Naruto** | `--hat ninja --prop rasengan --color orange --armR -3` |
-
-## File Structure
+## 文件结构
 
 ```
 clawd/
-├── SKILL.md              # Skill definition (3-mode routing, parameters)
-├── README.md             # This file
+├── SKILL.md                  # Skill 定义（三模式路由、参数说明）
+├── README.md                 # 本文件
 ├── scripts/
-│   └── render.sh         # Core rendering engine (690 lines)
+│   └── render.sh             # 核心渲染引擎（690 行）
 └── references/
-    ├── template.html     # Animation mode HTML template
-    ├── scene-template.html # Scene mode HTML template (v2)
-    ├── ice-cream.html    # Animation reference: multi-stage choreography
-    ├── clawd-kiss.html   # Animation reference: emotion/particle effects
-    ├── body-data.md      # Body pixel specifications
-    ├── decorations.md    # Hat/prop pixel data
-    └── presets.md        # Preset parameter quick reference
+    ├── template.html         # 动画模式 HTML 模板
+    ├── scene-template.html   # 场景模式 HTML 模板（v2）
+    ├── ice-cream.html        # 动画参考：多阶段编排
+    ├── clawd-kiss.html       # 动画参考：情绪/粒子效果
+    ├── body-data.md          # 身体像素数据
+    ├── decorations.md        # 帽子/道具像素数据
+    └── presets.md             # 预设参数速查
 ```
 
-## Changelog
+## 更新日志
 
-### v2 — Scene Mode
+### v2 — 场景模式
 
-- Added **Mode C: Scene Mode** for multi-character pixel panoramas
-- 1440×1920 (3:4) canvas with 360×480 tile grid
-- Full 16×9 Clawd body matrix with 16 hat types and dress colors
-- Procedural terrain: lakes, rivers, streams, paths with noise-based grass variation
-- Buildings: cafes, gazebos, playgrounds, basketball courts, market stalls, yoga areas
-- Particle systems: cherry blossoms, autumn leaves, fountain spray
-- Pre-computed water tile lists for smooth animation performance
-- Edge bleed design: no walls, content extends beyond frame borders
-- Scene template at `references/scene-template.html`
+- 新增**模式 C：场景模式** — 多角色像素全景大场景
+- 1440×1920（3:4）画布，360×480 格网格
+- 完整 16×9 Clawd 身体矩阵 + 16 种帽子 + 服装颜色
+- 程序化地形生成：湖泊、河流、小溪、路径（基于噪声的草地变化）
+- 建筑设施：咖啡馆、凉亭、游乐场、篮球场、集市摊位、瑜伽区
+- 粒子系统：樱花花瓣、秋叶、喷泉水花
+- 水面动画预计算，保证流畅性能
+- 边缘延伸设计：无围墙，内容延伸到画面外
+- 场景模板 `references/scene-template.html`
 
-### v1 — Initial Release
+### v1 — 首次发布
 
-- Terminal mode: ANSI half-block pixel art with render.sh
-- Animation mode: Single-character HTML animations (720×720)
-- 15 hats, 27 props, 3 face accessories, 27+ body colors
-- Anime cosplay series: One Piece, Naruto, Harry Potter
+- 终端模式：render.sh 渲染 ANSI 半块像素画
+- 动画模式：单角色 HTML 动画（720×720）
+- 15 种帽子、27 种道具、3 种面部配饰、27+ 身体颜色
+- 动漫 cosplay 系列：海贼王、火影忍者、哈利波特
 
-## License
+## 许可证
 
 MIT
