@@ -2,9 +2,9 @@
 
 A pixel-art avatar generator for **Clawd** (the Claude mascot crab) that runs directly in your terminal. Supports 15 hats, 27 props, 3 face accessories, 27+ body colors, and full pose control — all rendered as ANSI half-block characters with true color.
 
-Also includes an HTML animation mode for browser-based animated scenes.
+Three modes: terminal ANSI rendering, browser-based HTML animations, and **multi-character pixel scene panoramas**.
 
-![Terminal Mode](https://img.shields.io/badge/mode-terminal_ANSI-brightgreen) ![Animation Mode](https://img.shields.io/badge/mode-HTML_animation-blue)
+![Terminal Mode](https://img.shields.io/badge/mode-terminal_ANSI-brightgreen) ![Animation Mode](https://img.shields.io/badge/mode-HTML_animation-blue) ![Scene Mode](https://img.shields.io/badge/mode-pixel_scene-orange)
 
 ## Gallery
 
@@ -189,6 +189,25 @@ bash scripts/render.sh --hat crown --png output.png
 
 For dynamic scenes (eating, dancing, rain), the skill generates a self-contained HTML file using `references/template.html` as a base. These are 720×720 pixel-art animations at 30 FPS with seamless looping.
 
+## Scene Mode (v2)
+
+For multi-character panoramic scenes — think Pokemon pixel maps or 清明上河图 (Along the River During the Qingming Festival).
+
+Tell Claude something like:
+- "Draw a big scene with lots of crabs at a spring picnic"
+- "Make a pixel park panorama"
+- "清明上河图 style, many crabs doing different activities"
+
+What you get:
+- **1440×1920 canvas** (3:4 portrait), fixed camera, see everything at once
+- **20-60 crabs** doing different things: picnicking, fishing, kite-flying, playing basketball, doing yoga, walking dogs, painting, dancing...
+- **Rich terrain**: lakes, rivers, bridges, paths, flower gardens, buildings (cafes, gazebos, playgrounds, market stalls)
+- **Animated details**: flowing water, cherry blossom petals, falling leaves, fountain spray, butterflies, floating music notes
+- **Edge bleed**: buildings, trees, and crabs cut off at borders — the world extends beyond the frame
+- **16 hat types**, dress/skirt colors, and the full 16×9 Clawd body matrix for detailed characters
+
+The scene template lives at `references/scene-template.html`. Claude reads it as a structural reference and adapts the terrain, buildings, and character activities to match your theme.
+
 ## Character Presets
 
 | Character | Command |
@@ -204,18 +223,40 @@ For dynamic scenes (eating, dancing, rain), the skill generates a self-contained
 
 ```
 clawd/
-├── SKILL.md              # Skill definition (routing rules, parameters)
+├── SKILL.md              # Skill definition (3-mode routing, parameters)
 ├── README.md             # This file
 ├── scripts/
-│   └── render.sh         # Core rendering engine (685 lines)
+│   └── render.sh         # Core rendering engine (690 lines)
 └── references/
     ├── template.html     # Animation mode HTML template
+    ├── scene-template.html # Scene mode HTML template (v2)
     ├── ice-cream.html    # Animation reference: multi-stage choreography
     ├── clawd-kiss.html   # Animation reference: emotion/particle effects
     ├── body-data.md      # Body pixel specifications
     ├── decorations.md    # Hat/prop pixel data
     └── presets.md        # Preset parameter quick reference
 ```
+
+## Changelog
+
+### v2 — Scene Mode
+
+- Added **Mode C: Scene Mode** for multi-character pixel panoramas
+- 1440×1920 (3:4) canvas with 360×480 tile grid
+- Full 16×9 Clawd body matrix with 16 hat types and dress colors
+- Procedural terrain: lakes, rivers, streams, paths with noise-based grass variation
+- Buildings: cafes, gazebos, playgrounds, basketball courts, market stalls, yoga areas
+- Particle systems: cherry blossoms, autumn leaves, fountain spray
+- Pre-computed water tile lists for smooth animation performance
+- Edge bleed design: no walls, content extends beyond frame borders
+- Scene template at `references/scene-template.html`
+
+### v1 — Initial Release
+
+- Terminal mode: ANSI half-block pixel art with render.sh
+- Animation mode: Single-character HTML animations (720×720)
+- 15 hats, 27 props, 3 face accessories, 27+ body colors
+- Anime cosplay series: One Piece, Naruto, Harry Potter
 
 ## License
 
